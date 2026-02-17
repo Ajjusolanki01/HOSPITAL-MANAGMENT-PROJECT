@@ -1,0 +1,69 @@
+package com.lifecare.controller;
+
+import java.io.IOException;
+import java.util.ArrayList;
+//
+//import javax.servlet.RequestDispatcher;
+//import javax.servlet.ServletException;
+//import javax.servlet.annotation.WebServlet;
+//import javax.servlet.http.HttpServlet;
+//import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletResponse;
+
+import com.lifecare.dto.Patient;
+import com.lifecare.model.AdminModel;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/editCtrl")
+public class EditUpdateCtrl extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		int id = Integer.parseInt(request.getParameter("id"));
+
+		AdminModel model = new AdminModel();
+		Patient pt = model.getPatientRecord(id);
+
+		RequestDispatcher rd = request.getRequestDispatcher("edit.jsp");
+		request.setAttribute("PTN", pt);
+		rd.forward(request, response);
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		int id = Integer.parseInt(request.getParameter("pid"));
+		String name = request.getParameter("pname");
+		String gender = request.getParameter("gender");
+		int age = Integer.parseInt(request.getParameter("age"));
+		String disease = request.getParameter("disease");
+		String blood = request.getParameter("bgroup");
+		String mobile = request.getParameter("mobile");
+
+		Patient pt = new Patient(name, gender, age, disease, blood, mobile);
+		pt.setId(id);
+
+		AdminModel model = new AdminModel();
+		int i = model.updateRecord(pt);
+
+		ArrayList<Patient> list = model.getAllPatients();
+
+		RequestDispatcher rd = request.getRequestDispatcher("details.jsp");
+		if (i != 0) {
+			request.setAttribute("msg", "Record Updated Successfully");
+			request.setAttribute("LIST", list);
+		} else {
+			request.setAttribute("msg", "Record Not Update");
+			request.setAttribute("LIST", list);
+		}
+		rd.forward(request, response);
+	}
+}
